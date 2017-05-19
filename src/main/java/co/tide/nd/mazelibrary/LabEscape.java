@@ -29,6 +29,7 @@ public class LabEscape {
      * @throws          NoEscapeException when no path exists to the outside, from the selected starting point
      */
     public static char[][] drawPathForEscape(char[][] labyrinth, int startX, int startY) throws NoEscapeException {
+        // buld the initial path.
         ArrayList<Point> path = new ArrayList<>();
         path.add(new Point(startX, startY));
         
@@ -37,16 +38,27 @@ public class LabEscape {
             throw new NoEscapeException();
         }
         else {
+            char[][] output = clone(labyrinth);
             
+            // Draw the solution in the char[][]
+            solution.stream().forEach((p) -> {
+                output[p.getX()][p.getY()] = PATH;
+            });
+            
+            return output;
         }
-        throw new UnsupportedOperationException("please implement"); // TODO
     }
     
-    private static List<Point> solve(char[][] labyrinth, ArrayList<Point> path) {
-        System.out.println(path);
-        
+    /**
+     * 
+     * @param labyrinth
+     * @param path  The initial path already done in the labyrinth
+     * @return      The complete path to an escape or null if there is no path
+     *              to an escape.
+     */
+    private static List<Point> solve(char[][] labyrinth, ArrayList<Point> path) {        
         Point lastPoint = path.get(path.size()-1);
-        
+                
         if(escaped(labyrinth, lastPoint)) {
             return path;
         }
@@ -92,6 +104,13 @@ public class LabEscape {
         return null;
     }
         
+    /**
+     * 
+     * @param labyrinth
+     * @param point
+     * @return  The character (WALL or FREE) at this point or 0 if the point is
+     *          outside the labyrinth.
+     */
     private static char charAt(char[][] labyrinth, Point point) {
         if( point.getX() >= 0 &&
             point.getY() >= 0 &&
@@ -104,12 +123,36 @@ public class LabEscape {
         }
     }
     
+    /**
+     * 
+     * @param labyrinth
+     * @param point
+     * @return  True if this point is an escape point inside the labirynth.
+     *          FGalse otherwise.
+     */
     private static boolean escaped(char[][] labyrinth, Point point) {
         return
             (point.getX() == 0 ||
             point.getY() == 0 ||
             point.getX() == labyrinth.length-1 ||
-            point.getY() == labyrinth[0].length ) && charAt(labyrinth, point) == FREE;
+            point.getY() == labyrinth[0].length-1 ) && charAt(labyrinth, point) == FREE;
     }
+    
+    /**
+     * 
+     * @param labyrinth
+     * @return A clone of a char[][]
+     */
+    private static char[][] clone(char[][] labyrinth) {
+        char[][] result = new char[labyrinth.length][];
+        
+        for(int i = 0; i < labyrinth.length; i++) {
+            char[] line = labyrinth[i];
+            result[i] = new char[line.length];
+            System.arraycopy(labyrinth[i], 0, result[i], 0, line.length);
+        }
+        
+        return result;
+    } 
    
 }
